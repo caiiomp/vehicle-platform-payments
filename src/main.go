@@ -7,6 +7,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -24,6 +25,8 @@ type WebhookPayload struct {
 }
 
 func main() {
+	apiPort := os.Getenv("API_PORT")
+
 	app := gin.Default()
 
 	app.POST("/payments", func(ctx *gin.Context) {
@@ -47,8 +50,12 @@ func main() {
 		})
 	})
 
-	if err := app.Run(":4003"); err != nil {
-		log.Fatalf("could not initialize HTTP server: %s", err)
+	if apiPort == "" {
+		apiPort = "8080"
+	}
+
+	if err := app.Run(":" + apiPort); err != nil {
+		log.Fatalf("coult not initialize http server: %v", err)
 	}
 }
 
