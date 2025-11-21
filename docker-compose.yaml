@@ -1,0 +1,13 @@
+services:
+  vehicle-platform-payments:
+    build: .
+    container_name: api-vehicle-platform-payments
+    restart: always
+    environment:
+      API_PORT: "4003"
+    ports:
+      - "4003:4003"
+
+networks:
+  shared_network:
+    external: true
