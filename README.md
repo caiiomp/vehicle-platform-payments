@@ -38,15 +38,14 @@ Certifique-se de que você tem as seguintes dependências instaladas:
 3. Na raiz do projeto, inicie o serviço e suas dependências `docker`:
 
     ```bash
-    docker compose up -d
-    ```
-
-    Isso irá iniciar o serviço e as suas dependências localmente via contêiner. O serviço estará disponível em `http://localhost:4003`.
-
-    ⚠️ Para que consigamos rodar todos os serviços integrados, devemos criar uma rede compartilhada no docker. Caso não tenha criada, podemos criar com o seguinte comando:
-
-    ```bash
+    # Cria uma rede compartilhada do docker para a integração entre os serviços
     docker network create shared_network
+
+    # Faz o build das nossas imagens
+    docker compose build
+
+    # Sobe os serviços
+    docker compose up -d
     ```
 
 ### 3. Testando o serviço
