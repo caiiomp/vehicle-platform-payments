@@ -7,6 +7,8 @@ services:
       API_PORT: "4003"
     ports:
       - "4003:4003"
+    networks:
+      - shared_network
 
 networks:
   shared_network:

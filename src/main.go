@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 type Request struct {
