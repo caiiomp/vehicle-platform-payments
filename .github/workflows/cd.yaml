@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-deploy:
+    name: Build Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Google Cloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE_TAG=${{ github.sha }}
+          docker build -t ${{ vars.DOCKERHUB_USERNAME }}/vehicle-platform-payments:$IMAGE_TAG .
+          echo ${{ secrets.DOCKERHUB_TOKEN }} | docker login -u ${{ vars.DOCKERHUB_USERNAME }} --password-stdin
+          docker push ${{ vars.DOCKERHUB_USERNAME }}/vehicle-platform-payments:$IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Authenticate GCP
+        run: |
+          echo '${{ secrets.GCP_SA_KEY }}' > gcp-key.json
+          gcloud auth activate-service-account --key-file=gcp-key.json
+          gcloud config set project ${{ vars.GCP_PROJECT_ID }}
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy vehicle-platform-payments \
+            --image=${{ vars.DOCKERHUB_USERNAME }}/vehicle-platform-payments:${{ env.IMAGE_TAG }} \
+            --platform=managed \
+            --region=us-central1 \
+            --allow-unauthenticated
