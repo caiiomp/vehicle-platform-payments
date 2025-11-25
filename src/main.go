@@ -30,6 +30,10 @@ func main() {
 
 	app := gin.Default()
 
+	app.GET("/healthz", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "OK")
+	})
+
 	app.POST("/payments", func(ctx *gin.Context) {
 		var request Request
 		if err := ctx.ShouldBindJSON(&request); err != nil {
