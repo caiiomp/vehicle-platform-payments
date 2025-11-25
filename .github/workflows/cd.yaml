@@ -40,4 +40,6 @@ jobs:
             --image=${{ vars.DOCKERHUB_USERNAME }}/vehicle-platform-payments:${{ env.IMAGE_TAG }} \
             --platform=managed \
             --region=us-central1 \
+            --port=8080
             --allow-unauthenticated
+            --ingress=all
