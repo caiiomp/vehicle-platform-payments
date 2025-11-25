@@ -17,4 +17,6 @@ WORKDIR /app
 
 COPY --from=builder /app/vehicle-platform-payments .
 
+EXPOSE 8080
+
 CMD ["./vehicle-platform-payments"]
