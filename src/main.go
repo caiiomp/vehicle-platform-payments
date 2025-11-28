@@ -17,12 +17,17 @@ import (
 type Request struct {
 	WebhookURL string  `json:"webhook_url" binding:"required"`
 	Amount     float64 `json:"amount" binding:"required"`
-	Status     string  `json:"status" binding:"required"`
 }
 
 type WebhookPayload struct {
 	PaymentID string `json:"payment_id"`
 	Status    string `json:"status"`
+}
+
+var paymentStatuses = []string{
+	"APPROVED",
+	"CANCELED",
+	"REJECTED",
 }
 
 func main() {
@@ -44,14 +49,12 @@ func main() {
 		}
 
 		paymentID := generatePaymentID()
+		status := generatePaymentStatus()
 
-		go triggerWebhook(request.WebhookURL, paymentID, request.Status)
+		go triggerWebhook(request.WebhookURL, paymentID, status)
 
 		ctx.JSON(http.StatusOK, gin.H{
-			"payment_id":  paymentID,
-			"webhook_url": request.WebhookURL,
-			"status":      request.Status,
-			"amount":      request.Amount,
+			"payment_id": paymentID,
 		})
 	})
 
@@ -65,7 +68,7 @@ func main() {
 }
 
 func triggerWebhook(url, paymentID, status string) {
-	time.Sleep(10 * time.Second)
+	time.Sleep(5 * time.Second)
 
 	payload := WebhookPayload{
 		PaymentID: paymentID,
@@ -88,4 +91,10 @@ func triggerWebhook(url, paymentID, status string) {
 func generatePaymentID() string {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	return time.Now().Format("20060102150405")
+}
+
+func generatePaymentStatus() string {
+	rand.New(rand.NewSource(time.Now().UnixNano()))
+	randomIndex := rand.Intn(len(paymentStatuses))
+	return paymentStatuses[randomIndex]
 }
