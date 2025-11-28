@@ -17,17 +17,12 @@ import (
 type Request struct {
 	WebhookURL string  `json:"webhook_url" binding:"required"`
 	Amount     float64 `json:"amount" binding:"required"`
+	Status     string  `json:"status" binding:"required"`
 }
 
 type WebhookPayload struct {
 	PaymentID string `json:"payment_id"`
 	Status    string `json:"status"`
-}
-
-var paymentStatuses = []string{
-	"APPROVED",
-	"CANCELED",
-	"REJECTED",
 }
 
 func main() {
@@ -49,9 +44,8 @@ func main() {
 		}
 
 		paymentID := generatePaymentID()
-		status := generatePaymentStatus()
 
-		go triggerWebhook(request.WebhookURL, paymentID, status)
+		go triggerWebhook(request.WebhookURL, paymentID, request.Status)
 
 		ctx.JSON(http.StatusOK, gin.H{
 			"payment_id": paymentID,
@@ -91,10 +85,4 @@ func triggerWebhook(url, paymentID, status string) {
 func generatePaymentID() string {
 	rand.New(rand.NewSource(time.Now().UnixNano()))
 	return time.Now().Format("20060102150405")
-}
-
-func generatePaymentStatus() string {
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	randomIndex := rand.Intn(len(paymentStatuses))
-	return paymentStatuses[randomIndex]
 }
